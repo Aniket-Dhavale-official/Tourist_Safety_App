@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../widgets/app_header.dart';
+import '../widgets/app_drawer.dart';
 import '../models/trip_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -80,9 +81,9 @@ class _AddTripPageState extends State<AddTripPage> {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not logged in")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("User not logged in")));
       return;
     }
 
@@ -118,17 +119,23 @@ class _AddTripPageState extends State<AddTripPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error saving trip: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error saving trip: $e")));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Widget _field(String label, TextEditingController controller,
-      {bool required = true, IconData? icon, VoidCallback? onTap, bool readOnly = false}) {
+  Widget _field(
+    String label,
+    TextEditingController controller, {
+    bool required = true,
+    IconData? icon,
+    VoidCallback? onTap,
+    bool readOnly = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
@@ -136,16 +143,15 @@ class _AddTripPageState extends State<AddTripPage> {
         readOnly: readOnly,
         onTap: onTap,
         validator: required
-            ? (value) => value == null || value.isEmpty ? "Please enter $label" : null
+            ? (value) =>
+                  value == null || value.isEmpty ? "Please enter $label" : null
             : null,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: icon != null ? Icon(icon, color: Colors.blueGrey) : null,
           filled: true,
           fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey.shade300),
@@ -159,9 +165,10 @@ class _AddTripPageState extends State<AddTripPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
-          const AppHeader(showBackButton: true),
+          const AppHeader(showBackButton: false),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -173,16 +180,31 @@ class _AddTripPageState extends State<AddTripPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          widget.existingTrip != null ? "Edit Trip" : "Plan New Trip",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1E3A8A),
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.map,
+                              size: 28,
+                              color: const Color(0xFF1E3A8A),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              widget.existingTrip != null
+                                  ? "Edit Trip"
+                                  : "Plan New Trip",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E3A8A),
+                              ),
+                            ),
+                          ],
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blue.shade100,
                             borderRadius: BorderRadius.circular(8),
@@ -199,8 +221,16 @@ class _AddTripPageState extends State<AddTripPage> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _field("Source", sourceController, icon: Icons.location_on_outlined),
-                    _field("Destination", destinationController, icon: Icons.flag_outlined),
+                    _field(
+                      "Source",
+                      sourceController,
+                      icon: Icons.location_on_outlined,
+                    ),
+                    _field(
+                      "Destination",
+                      destinationController,
+                      icon: Icons.flag_outlined,
+                    ),
                     Row(
                       children: [
                         Expanded(
@@ -224,32 +254,63 @@ class _AddTripPageState extends State<AddTripPage> {
                         ),
                       ],
                     ),
-                    _field("Duration", durationController, icon: Icons.timer_outlined),
-                    _field("Mode of Travel", modeController, icon: Icons.directions_bus_outlined),
-                    _field("Route Details", routeController, icon: Icons.map_outlined),
-                    _field("Stops (Optional)", stopsController, required: false, icon: Icons.stop_circle_outlined),
+                    _field(
+                      "Duration",
+                      durationController,
+                      icon: Icons.timer_outlined,
+                    ),
+                    _field(
+                      "Mode of Travel",
+                      modeController,
+                      icon: Icons.directions_bus_outlined,
+                    ),
+                    _field(
+                      "Route Details",
+                      routeController,
+                      icon: Icons.map_outlined,
+                    ),
+                    _field(
+                      "Stops (Optional)",
+                      stopsController,
+                      required: false,
+                      icon: Icons.stop_circle_outlined,
+                    ),
                     const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
                       height: 55,
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: _isLoading ? null : _saveTrip,
+                        icon: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(
+                                widget.existingTrip != null
+                                    ? Icons.update
+                                    : Icons.save,
+                              ),
+                        label: Text(
+                          widget.existingTrip != null
+                              ? "Update Trip"
+                              : "Save Trip",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0F766E),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                widget.existingTrip != null ? "Update Trip" : "Save Trip",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
                       ),
                     ),
                     const SizedBox(height: 20),

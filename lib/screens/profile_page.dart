@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_header.dart';
+import '../widgets/app_drawer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,24 +13,33 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isEditing = false;
   final Color primaryColor = const Color(0xFF1E3A8A);
 
-  final TextEditingController contactController =
-  TextEditingController(text: "+91 9876543210");
-  final TextEditingController heightController =
-  TextEditingController(text: "170 cm");
-  final TextEditingController weightController =
-  TextEditingController(text: "70 kg");
-  final TextEditingController dobController =
-  TextEditingController(text: "01/01/2000");
-  final TextEditingController allergiesController =
-  TextEditingController(text: "None");
-  final TextEditingController medicationController =
-  TextEditingController(text: "None");
-  final TextEditingController doctorController =
-  TextEditingController(text: "Dr. Sharma - 9876543211");
-  final TextEditingController emergency1Controller =
-  TextEditingController(text: "Father - 9876543212");
-  final TextEditingController emergency2Controller =
-  TextEditingController(text: "Mother - 9876543213");
+  final TextEditingController contactController = TextEditingController(
+    text: "+91 9876543210",
+  );
+  final TextEditingController heightController = TextEditingController(
+    text: "170 cm",
+  );
+  final TextEditingController weightController = TextEditingController(
+    text: "70 kg",
+  );
+  final TextEditingController dobController = TextEditingController(
+    text: "01/01/2000",
+  );
+  final TextEditingController allergiesController = TextEditingController(
+    text: "None",
+  );
+  final TextEditingController medicationController = TextEditingController(
+    text: "None",
+  );
+  final TextEditingController doctorController = TextEditingController(
+    text: "Dr. Sharma - 9876543211",
+  );
+  final TextEditingController emergency1Controller = TextEditingController(
+    text: "Father - 9876543212",
+  );
+  final TextEditingController emergency2Controller = TextEditingController(
+    text: "Mother - 9876543213",
+  );
 
   /// ================= AGE CALCULATION =================
   int calculateAge() {
@@ -45,8 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
       int age = today.year - birthDate.year;
 
       if (today.month < birthDate.month ||
-          (today.month == birthDate.month &&
-              today.day < birthDate.day)) {
+          (today.month == birthDate.month && today.day < birthDate.day)) {
         age--;
       }
       return age;
@@ -78,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (picked != null) {
       setState(() {
         dobController.text =
-        "${picked.day.toString().padLeft(2, '0')}/"
+            "${picked.day.toString().padLeft(2, '0')}/"
             "${picked.month.toString().padLeft(2, '0')}/"
             "${picked.year}";
       });
@@ -86,8 +95,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /// ================= INPUT FIELD =================
-  Widget buildField(String label, TextEditingController controller,
-      {bool isDob = false}) {
+  Widget buildField(
+    String label,
+    TextEditingController controller, {
+    bool isDob = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
@@ -98,21 +110,23 @@ class _ProfilePageState extends State<ProfilePage> {
           labelText: label,
           filled: true,
           fillColor: Colors.grey.shade50,
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
           ),
-          suffixIcon: isDob
-              ? const Icon(Icons.calendar_today)
-              : null,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          suffixIcon: isDob ? const Icon(Icons.calendar_today) : null,
         ),
       ),
     );
   }
 
-  /// ================= SECTION CARD =================
-  Widget sectionCard({required String title, required Widget child}) {
+  /// ================= SECTION CARD WITH ICON =================
+  Widget sectionCard({
+    required String title,
+    required Widget child,
+    IconData? icon,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       padding: const EdgeInsets.all(20),
@@ -124,16 +138,27 @@ class _ProfilePageState extends State<ProfilePage> {
             color: Colors.black12,
             blurRadius: 12,
             offset: Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: primaryColor, size: 24),
+                const SizedBox(width: 12),
+              ],
+              Text(
+                title,
+                style: const TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.w600)),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 15),
           child,
         ],
@@ -147,19 +172,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
-          const AppHeader(showBackButton: true),
+          const AppHeader(showBackButton: false),
 
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-
                   /// ================= PERSONAL INFO =================
                   sectionCard(
                     title: "Personal Information",
+                    icon: Icons.person,
                     child: Column(
                       children: [
                         Stack(
@@ -167,7 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             const CircleAvatar(
                               radius: 55,
                               backgroundImage: NetworkImage(
-                                  "https://via.placeholder.com/150"),
+                                "https://via.placeholder.com/150",
+                              ),
                             ),
                             if (isEditing)
                               Positioned(
@@ -182,20 +209,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                     color: Colors.white,
                                   ),
                                 ),
-                              )
+                              ),
                           ],
                         ),
                         const SizedBox(height: 20),
                         buildField("Contact Number", contactController),
-                        buildField("Date of Birth (DD/MM/YYYY)",
-                            dobController,
-                            isDob: true),
+                        buildField(
+                          "Date of Birth (DD/MM/YYYY)",
+                          dobController,
+                          isDob: true,
+                        ),
                         const SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text("Age: $age years",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600)),
+                          child: Text(
+                            "Age: $age years",
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ],
                     ),
@@ -204,6 +234,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   /// ================= PHYSICAL =================
                   sectionCard(
                     title: "Physical Details",
+                    icon: Icons.fitness_center,
                     child: Column(
                       children: [
                         buildField("Height", heightController),
@@ -215,6 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   /// ================= MEDICAL =================
                   sectionCard(
                     title: "Medical Information",
+                    icon: Icons.local_hospital,
                     child: Column(
                       children: [
                         buildField("Allergies", allergiesController),
@@ -227,12 +259,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   /// ================= EMERGENCY =================
                   sectionCard(
                     title: "Emergency Contacts",
+                    icon: Icons.emergency,
                     child: Column(
                       children: [
-                        buildField(
-                            "Emergency Contact 1", emergency1Controller),
-                        buildField(
-                            "Emergency Contact 2", emergency2Controller),
+                        buildField("Emergency Contact 1", emergency1Controller),
+                        buildField("Emergency Contact 2", emergency2Controller),
                       ],
                     ),
                   ),
@@ -245,15 +276,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       setState(() => isEditing = !isEditing);
                     },
                     icon: Icon(isEditing ? Icons.save : Icons.edit),
-                    label: Text(
-                        isEditing ? "Save Profile" : "Edit Profile"),
+                    label: Text(isEditing ? "Save Profile" : "Edit Profile"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      minimumSize:
-                      const Size(double.infinity, 55),
+                      minimumSize: const Size(double.infinity, 55),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                   ),
@@ -268,11 +296,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: const Icon(Icons.lock_outline),
                     label: const Text("Change Password"),
                     style: OutlinedButton.styleFrom(
-                      minimumSize:
-                      const Size(double.infinity, 55),
+                      minimumSize: const Size(double.infinity, 55),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                   ),
@@ -285,4 +311,3 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-

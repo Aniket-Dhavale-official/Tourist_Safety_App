@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_header.dart';
+import '../widgets/app_drawer.dart';
+import '../widgets/trip_statistics_chart.dart';
+import '../widgets/safety_stats_card.dart';
 import 'add_trip_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,9 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
   void _openAddTrip() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddTripPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddTripPage()),
     );
   }
 
@@ -42,6 +43,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           const AppHeader(),
@@ -51,6 +53,51 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // 📊 SAFETY STATISTICS CARDS
+                  const Text(
+                    "Safety Overview",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 16),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    children: [
+                      SafetyStatsCard(
+                        title: 'Active Trips',
+                        value: '3',
+                        icon: Icons.card_travel,
+                        color: const Color(0xFF1E3A8A),
+                      ),
+                      SafetyStatsCard(
+                        title: 'Alerts',
+                        value: '0',
+                        icon: Icons.notifications_active,
+                        color: const Color(0xFFDC2626),
+                      ),
+                      SafetyStatsCard(
+                        title: 'Safe Zones',
+                        value: '12',
+                        icon: Icons.location_on,
+                        color: const Color(0xFF0F766E),
+                      ),
+                      SafetyStatsCard(
+                        title: 'Emergency',
+                        value: '05',
+                        icon: Icons.emergency,
+                        color: const Color(0xFFFB923C),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  // 📈 TRIP STATISTICS CHART
+                  const TripStatisticsChart(tripCounts: [2, 3, 1, 4, 2, 5, 3]),
+                  const SizedBox(height: 24),
+
                   const Text(
                     "Active Trip",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
@@ -91,7 +138,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 color: Colors.black12,
                                 blurRadius: 12,
                                 offset: Offset(0, 4),
-                              )
+                              ),
                             ],
                           ),
                           child: const Center(
@@ -124,42 +171,77 @@ class _DashboardPageState extends State<DashboardPage> {
                                         color: Colors.black12,
                                         blurRadius: 12,
                                         offset: Offset(0, 4),
-                                      )
+                                      ),
                                     ],
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             "Trip ID: ${trip['id']}",
                                             style: const TextStyle(
-                                                fontSize: 18, fontWeight: FontWeight.w600),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                          Icon(Icons.directions_car, color: primaryColor),
+                                          Icon(
+                                            Icons.directions_car,
+                                            color: primaryColor,
+                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 12),
                                       Text(
                                         "${trip['source']} → ${trip['destination']}",
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
-                                          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                                          const Icon(
+                                            Icons.calendar_today,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
                                           const SizedBox(width: 6),
                                           Text("${trip['date']}"),
                                           const SizedBox(width: 16),
-                                          const Icon(Icons.access_time, size: 16, color: Colors.grey),
+                                          const Icon(
+                                            Icons.access_time,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
                                           const SizedBox(width: 6),
                                           Text("${trip['time']}"),
                                         ],
                                       ),
                                       const SizedBox(height: 6),
-                                      Text("Mode: ${trip['mode']}", style: const TextStyle(color: Colors.grey)),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.route,
+                                            size: 14,
+                                            color: Colors.grey,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Expanded(
+                                            child: Text(
+                                              "Mode: ${trip['mode']}",
+                                              style: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -168,30 +250,42 @@ class _DashboardPageState extends State<DashboardPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: ElevatedButton(
+                                      child: ElevatedButton.icon(
                                         onPressed: () {},
+                                        icon: const Icon(Icons.error_outline),
+                                        label: const Text("Submit Issue"),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: primaryColor,
-                                          minimumSize: const Size(double.infinity, 50),
+                                          minimumSize: const Size(
+                                            double.infinity,
+                                            50,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
-                                        child: const Text("Submit Issue"),
                                       ),
                                     ),
                                     const SizedBox(width: 14),
                                     Expanded(
-                                      child: ElevatedButton(
+                                      child: ElevatedButton.icon(
                                         onPressed: () {},
+                                        icon: const Icon(Icons.history),
+                                        label: const Text("View History"),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: secondaryColor,
-                                          minimumSize: const Size(double.infinity, 50),
+                                          minimumSize: const Size(
+                                            double.infinity,
+                                            50,
+                                          ),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
-                                        child: const Text("View History"),
                                       ),
                                     ),
                                   ],
@@ -206,21 +300,62 @@ class _DashboardPageState extends State<DashboardPage> {
 
                   const SizedBox(height: 30),
                   // 🚨 PANIC BUTTON
-                  ElevatedButton(
-                    onPressed: () {},
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Row(
+                            children: [
+                              Icon(Icons.warning, color: Color(0xFFDC2626)),
+                              SizedBox(width: 10),
+                              Text('Emergency Alert'),
+                            ],
+                          ),
+                          content: const Text(
+                            'Are you sure you want to trigger the panic alert? Your emergency contacts will be notified immediately.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Emergency alert sent! Help is on the way.',
+                                    ),
+                                    backgroundColor: Color(0xFFDC2626),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFDC2626),
+                              ),
+                              child: const Text('SEND ALERT'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.emergency, size: 28),
+                    label: const Text(
+                      "PANIC",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: dangerColor,
                       minimumSize: const Size(double.infinity, 65),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                    child: const Text(
-                      "PANIC",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2),
                     ),
                   ),
                   const SizedBox(height: 20),
