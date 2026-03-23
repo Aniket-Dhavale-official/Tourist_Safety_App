@@ -4,6 +4,7 @@ import '../widgets/app_drawer.dart';
 import '../widgets/trip_statistics_chart.dart';
 import '../widgets/safety_stats_card.dart';
 import 'add_trip_page.dart';
+import 'emergency_selection_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -302,42 +303,10 @@ class _DashboardPageState extends State<DashboardPage> {
                   // 🚨 PANIC BUTTON
                   ElevatedButton.icon(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Row(
-                            children: [
-                              Icon(Icons.warning, color: Color(0xFFDC2626)),
-                              SizedBox(width: 10),
-                              Text('Emergency Alert'),
-                            ],
-                          ),
-                          content: const Text(
-                            'Are you sure you want to trigger the panic alert? Your emergency contacts will be notified immediately.',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Cancel'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Emergency alert sent! Help is on the way.',
-                                    ),
-                                    backgroundColor: Color(0xFFDC2626),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFDC2626),
-                              ),
-                              child: const Text('SEND ALERT'),
-                            ),
-                          ],
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EmergencySelectionPage(),
                         ),
                       );
                     },
